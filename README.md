@@ -10,6 +10,6 @@ npm install @ttk1/easy-webgpu
 
 ## Example
 
-https://github.com/ttk1/easy-webgpu/blob/master/src/main.ts
+https://github.com/ttk1/easy-webgpu/blob/main/src/main.ts
 
 Demo: https://ttk1.github.io/easy-webgpu/
