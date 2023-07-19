@@ -11,12 +11,12 @@ export class Renderer {
   private depthTexture: GPUTexture;
   private renderPipeline: GPURenderPipeline;
   private sampler: GPUSampler;
+  private numLightsBuffer: GPUBuffer;
+  private lightsBuffer: GPUBuffer;
+  private viewBuffer: GPUBuffer;
+  private projectionBuffer: GPUBuffer;
   private bindings: Map<InstancedMesh, {
     bindGroup: GPUBindGroup,
-    numLights: GPUBuffer,
-    lights: GPUBuffer,
-    view: GPUBuffer,
-    projection: GPUBuffer,
     offsets: GPUBuffer,
     normals: GPUBuffer,
     positions: GPUBuffer,
@@ -153,6 +153,24 @@ export class Renderer {
       minFilter: 'linear'
     });
 
+    this.numLightsBuffer = this.device.createBuffer({
+      size: 4,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+    });
+    this.lightsBuffer = this.device.createBuffer({
+      // アライメントの都合で 4*4 とする
+      size: 4 * 4 * 20,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+    });
+    this.viewBuffer = this.device.createBuffer({
+      size: 16 * 4,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+    });
+    this.projectionBuffer = this.device.createBuffer({
+      size: 16 * 4,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+    });
+
     this.bindings = new Map();
   }
 
@@ -173,6 +191,11 @@ export class Renderer {
     const numLights = new Uint32Array([lights.length]);
     const view = new Float32Array(camera.getViewMatrix().toArray());
     const projection = new Float32Array(camera.getProjectionMatrix().toArray());
+
+    this.device.queue.writeBuffer(this.numLightsBuffer, 0, numLights, 0, numLights.length);
+    this.device.queue.writeBuffer(this.lightsBuffer, 0, lightsData, 0, lightsData.length);
+    this.device.queue.writeBuffer(this.viewBuffer, 0, view, 0, view.length);
+    this.device.queue.writeBuffer(this.projectionBuffer, 0, projection, 0, projection.length);
 
     // clear
     commandEncoder.beginRenderPass({
@@ -247,48 +270,31 @@ export class Renderer {
           }
         );
 
-        const numLightsBuffer = this.device.createBuffer({
-          size: 4,
-          usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
-        });
-        const lightsBuffer = this.device.createBuffer({
-          // アライメントの都合で 4*4 とする
-          size: 4 * 4 * 20,
-          usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
-        });
-        const viewBuffer = this.device.createBuffer({
-          size: 16 * 4,
-          usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
-        });
-        const projectionBuffer = this.device.createBuffer({
-          size: 16 * 4,
-          usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
-        });
         const bindGroup = this.device.createBindGroup({
           layout: this.renderPipeline.getBindGroupLayout(0),
           entries: [
             {
               binding: 0,
               resource: {
-                buffer: numLightsBuffer
+                buffer: this.numLightsBuffer
               },
             },
             {
               binding: 1,
               resource: {
-                buffer: lightsBuffer
+                buffer: this.lightsBuffer
               },
             },
             {
               binding: 2,
               resource: {
-                buffer: viewBuffer
+                buffer: this.viewBuffer
               },
             },
             {
               binding: 3,
               resource: {
-                buffer: projectionBuffer
+                buffer: this.projectionBuffer
               },
             },
             {
@@ -347,10 +353,6 @@ export class Renderer {
         this.device.queue.writeBuffer(textureIdBuffer, 0, textureIds, 0, textureIds.length);
         binding = {
           bindGroup: bindGroup,
-          numLights: numLightsBuffer,
-          lights: lightsBuffer,
-          view: viewBuffer,
-          projection: projectionBuffer,
           offsets: offsetBuffer,
           normals: normalBuffer,
           positions: positionBuffer,
@@ -360,12 +362,6 @@ export class Renderer {
         };
         this.bindings.set(mesh, binding);
       }
-
-      this.device.queue.writeBuffer(binding.numLights, 0, numLights, 0, numLights.length);
-      this.device.queue.writeBuffer(binding.lights, 0, lightsData, 0, lightsData.length);
-      this.device.queue.writeBuffer(binding.view, 0, view, 0, view.length);
-      this.device.queue.writeBuffer(binding.projection, 0, projection, 0, projection.length);
-
       const renderPass = commandEncoder.beginRenderPass({
         colorAttachments: [
           {
