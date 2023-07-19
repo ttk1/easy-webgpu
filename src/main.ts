@@ -5,7 +5,7 @@ import { InstancedCube } from './mesh/instancedCube';
 import { InstancedSquare } from './mesh/instancedSquare';
 import { Renderer } from './renderer';
 import { Scene } from './scene';
-import { fetchImage } from './util';
+import { fetchImageData } from './util';
 import { Vec3 } from './vector';
 
 /**
@@ -57,8 +57,8 @@ window.onload = async () => {
 
   const mesh1 = new InstancedCube();
   mesh1.setTextureImages([
-    await fetchImage('./texture/dice.png')
-  ], 256, 192);
+    await fetchImageData('./texture/dice.png')
+  ]);
   scene.addMesh(mesh1);
   for (let i = 0; i < 100; i++) {
     mesh1.addInstance(new Vec3(
@@ -70,8 +70,8 @@ window.onload = async () => {
 
   const mesh2 = new InstancedCube();
   mesh2.setTextureImages([
-    await fetchImage('./texture/dice2.png')
-  ], 256, 192);
+    await fetchImageData('./texture/dice2.png')
+  ]);
   scene.addMesh(mesh2);
   for (let i = 0; i < 100; i++) {
     mesh2.addInstance(new Vec3(
@@ -84,9 +84,9 @@ window.onload = async () => {
   // square 版
   const mesh3 = new InstancedSquare();
   mesh3.setTextureImages([
-    await fetchImage('./texture/white.png'),
-    await fetchImage('./texture/yellow.png')
-  ], 64, 64);
+    await fetchImageData('./texture/white.png'),
+    await fetchImageData('./texture/yellow.png')
+  ]);
   scene.addMesh(mesh3);
   for (let i = 0; i < 100; i++) {
     mesh3.addInstance(new Vec3(

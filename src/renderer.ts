@@ -184,7 +184,7 @@ export class Renderer {
 
     // uniform データの作成
     const lights = scene.getLights();
-    const lightsData = new Float32Array(lights.flatMap((light) =>{
+    const lightsData = new Float32Array(lights.flatMap((light) => {
       // アライメントの都合で最後に0を追加する
       return [light.getX(), light.getY(), light.getZ(), 0];
     }));
@@ -219,8 +219,9 @@ export class Renderer {
       let binding = this.bindings.get(mesh);
       if (binding == null) {
         const textureImages = mesh.getTextureImages();
-        const textureWidth = mesh.getTextureWidth();
-        const textureHeight = mesh.getTextureHeight();
+        // 一つ目の width と height を使用
+        const textureWidth = textureImages[0].width;
+        const textureHeight = textureImages[0].height;
         const textureCount = textureImages.length;
         const texture = this.device.createTexture({
           size: [
@@ -241,16 +242,8 @@ export class Renderer {
           mappedAtCreation: true
         });
         const pixelData = new Uint8Array(textureBuffer.getMappedRange());
-        const cvs = document.createElement('canvas');
         textureImages.forEach((textureImage, idx) => {
-          cvs.width = textureWidth;
-          cvs.height = textureHeight;
-          const ctx = cvs.getContext('2d');
-          if (ctx == null) {
-            throw new Error('テクスチャのロードに失敗しました');
-          }
-          ctx.drawImage(textureImage, 0, 0);
-          pixelData.set(ctx.getImageData(0, 0, textureWidth, textureHeight).data, textureWidth * textureHeight * idx * 4);
+          pixelData.set(textureImage.data, textureWidth * textureHeight * idx * 4);
         });
         textureBuffer.unmap();
 

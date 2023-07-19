@@ -43,17 +43,7 @@ export interface InstancedMesh {
    * TODO: ここに置くのがよい？
    * @returns テクスチャの配列, textureId の順番で格納されている
    */
-  getTextureImages(): HTMLImageElement[];
-
-  /**
-   * テクスチャの幅を返す
-   */
-  getTextureWidth(): number;
-
-  /**
-   * テクスチャの高さを返す
-   */
-  getTextureHeight(): number;
+  getTextureImages(): ImageData[];
 
   /**
    * インスタンスの数を返す

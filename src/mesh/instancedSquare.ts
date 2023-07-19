@@ -7,9 +7,7 @@ import { InstancedMesh } from './instancedMesh';
  * Square のインスタンス化バージョン
  */
 export class InstancedSquare extends GeometryBase implements InstancedMesh {
-  private textureImages: HTMLImageElement[];
-  private textureWidth: number;
-  private textureHeight: number;
+  private textureImages: ImageData[];
   private instancePositions: Vec3[];
   private instanceRotations: number[];
   private instanceTextureIds: number[];
@@ -17,8 +15,6 @@ export class InstancedSquare extends GeometryBase implements InstancedMesh {
   public constructor() {
     super();
     this.textureImages = [];
-    this.textureWidth = 512;
-    this.textureHeight = 512;
     this.instancePositions = [];
     this.instanceRotations = [];
     this.instanceTextureIds = [];
@@ -63,26 +59,16 @@ export class InstancedSquare extends GeometryBase implements InstancedMesh {
     this.instanceRotations.push(face);
   }
 
-  public setTextureImages(textureImages: HTMLImageElement[], width = 512, height = 512): void {
-    this.textureWidth = width;
-    this.textureHeight = height;
+  public setTextureImages(textureImages: ImageData[]): void {
     this.textureImages = textureImages;
   }
 
-  public getTextureImages(): HTMLImageElement[] {
-    const arr: HTMLImageElement[] = [];
+  public getTextureImages(): ImageData[] {
+    const arr: ImageData[] = [];
     this.textureImages.forEach((textureImage) => {
       arr.push(textureImage);
     });
     return arr;
-  }
-
-  public getTextureWidth(): number {
-    return this.textureWidth;
-  }
-
-  public getTextureHeight(): number {
-    return this.textureHeight;
   }
 
   public getInstancePositions(): number[] {
