@@ -82,12 +82,12 @@ export class FPSKeyboard {
 export class FPSMouse {
   private lastMovementX = 0;
   private lastMovementY = 0;
+  private sensitivity = 0.003;
 
   public constructor(window: Window, camera: Camera, sensitivity?: number) {
     // 感度のデフォルト値設定
-    if (sensitivity == null) {
-      sensitivity = 0.003;
-    }
+    this.sensitivity = sensitivity || 0.003;
+
     const handleMouseMove = (event: MouseEvent) => {
       // マウスによっては値がたまに跳ねてカメラの方向が急に変わってしまう場合があるので
       // 前回の値も踏まえ調整する
@@ -103,8 +103,8 @@ export class FPSMouse {
       // キャンバスは縦方向が y なのでここで入れ替えている
       // ここにカメラのインスタンスの処理を入れたくないが。。。とりあえずこの実装で
       camera.rotate(new Vec3(
-        event.movementY * sensitivity,
-        event.movementX * sensitivity,
+        event.movementY * this.sensitivity,
+        event.movementX * this.sensitivity,
         0
       ));
     };

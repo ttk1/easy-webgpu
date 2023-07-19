@@ -7,12 +7,11 @@
     "outDir": "./dist",
     "declaration": true,
     "sourceMap": true,
-    "typeRoots": [ "./node_modules/@webgpu/types", "./node_modules/@types"]
+    "typeRoots": [ "./node_modules/@webgpu/types", "./node_modules/@types"],
+    "strictNullChecks": true,
+    "noImplicitAny": true
   },
   "include": [
-    "./src"
-  ],
-  "exclude": [
-    "./src/backup/*"
-  ],
+    "src/**/*"
+  ]
 }

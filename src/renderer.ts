@@ -193,7 +193,8 @@ export class Renderer {
     }).end();
 
     scene.getMeshes().forEach((mesh) => {
-      if (!this.bindings.has(mesh)) {
+      let binding = this.bindings.get(mesh);
+      if (binding == null) {
         const textureImages = mesh.getTextureImages();
         const textureWidth = mesh.getTextureWidth();
         const textureHeight = mesh.getTextureHeight();
@@ -222,6 +223,9 @@ export class Renderer {
           cvs.width = textureWidth;
           cvs.height = textureHeight;
           const ctx = cvs.getContext('2d');
+          if (ctx == null) {
+            throw new Error('テクスチャのロードに失敗しました');
+          }
           ctx.drawImage(textureImage, 0, 0);
           pixelData.set(ctx.getImageData(0, 0, textureWidth, textureHeight).data, textureWidth * textureHeight * idx * 4);
         });
@@ -341,8 +345,7 @@ export class Renderer {
           usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
         });
         this.device.queue.writeBuffer(textureIdBuffer, 0, textureIds, 0, textureIds.length);
-
-        this.bindings.set(mesh, {
+        binding = {
           bindGroup: bindGroup,
           numLights: numLightsBuffer,
           lights: lightsBuffer,
@@ -354,14 +357,14 @@ export class Renderer {
           rotations: rotationBuffer,
           uvs: uvBuffer,
           textureIds: textureIdBuffer
-        });
+        };
+        this.bindings.set(mesh, binding);
       }
 
-      const bindings = this.bindings.get(mesh);
-      this.device.queue.writeBuffer(bindings.numLights, 0, numLights, 0, numLights.length);
-      this.device.queue.writeBuffer(bindings.lights, 0, lightsData, 0, lightsData.length);
-      this.device.queue.writeBuffer(bindings.view, 0, view, 0, view.length);
-      this.device.queue.writeBuffer(bindings.projection, 0, projection, 0, projection.length);
+      this.device.queue.writeBuffer(binding.numLights, 0, numLights, 0, numLights.length);
+      this.device.queue.writeBuffer(binding.lights, 0, lightsData, 0, lightsData.length);
+      this.device.queue.writeBuffer(binding.view, 0, view, 0, view.length);
+      this.device.queue.writeBuffer(binding.projection, 0, projection, 0, projection.length);
 
       const renderPass = commandEncoder.beginRenderPass({
         colorAttachments: [
@@ -378,13 +381,13 @@ export class Renderer {
         }
       });
       renderPass.setPipeline(this.renderPipeline);
-      renderPass.setBindGroup(0, bindings.bindGroup);
-      renderPass.setVertexBuffer(0, bindings.offsets);
-      renderPass.setVertexBuffer(1, bindings.normals);
-      renderPass.setVertexBuffer(2, bindings.positions);
-      renderPass.setVertexBuffer(3, bindings.rotations);
-      renderPass.setVertexBuffer(4, bindings.uvs);
-      renderPass.setVertexBuffer(5, bindings.textureIds);
+      renderPass.setBindGroup(0, binding.bindGroup);
+      renderPass.setVertexBuffer(0, binding.offsets);
+      renderPass.setVertexBuffer(1, binding.normals);
+      renderPass.setVertexBuffer(2, binding.positions);
+      renderPass.setVertexBuffer(3, binding.rotations);
+      renderPass.setVertexBuffer(4, binding.uvs);
+      renderPass.setVertexBuffer(5, binding.textureIds);
       renderPass.draw(mesh.getVertexCount(), mesh.getInstanceCount());
       renderPass.end();
     });

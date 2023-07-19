@@ -20,7 +20,13 @@ window.onload = async () => {
   cvs.width = 1000;
   cvs.height = 500;
   const ctx = cvs.getContext('webgpu');
+  if (ctx == null) {
+    return;
+  }
   const adapter = await navigator.gpu.requestAdapter();
+  if (adapter == null) {
+    return;
+  }
   const device = await adapter.requestDevice();
 
   // 情報表示
@@ -101,8 +107,8 @@ window.onload = async () => {
   wheelZoom(camera);
 
   // パラメータ回り
-  let requestId = null;
-  let lastTimestamp = null;
+  let requestId: number | null = null;
+  let lastTimestamp = 0;
 
   // カメラの移動速度
   let vLR = 0;
@@ -123,7 +129,7 @@ window.onload = async () => {
 
   // アニメーション処理
   const step = async (timestamp: number) => {
-    const timeGap = timestamp - lastTimestamp;
+    const timeGap = timestamp - (lastTimestamp || timestamp);
     lastTimestamp = timestamp;
 
     /*** 描画処理ここから ***/
