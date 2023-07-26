@@ -1,7 +1,9 @@
 import { PerspectiveCamera } from './camera';
 import { FPSKeyboard, FPSMouse, wheelZoom } from './input';
 import { Light } from './light';
+import { loadObj } from './loader';
 import { InstancedCube } from './mesh/instancedCube';
+import { InstancedCustomMesh } from './mesh/instancedCustomMesh';
 import { InstancedSquare } from './mesh/instancedSquare';
 import { Renderer } from './renderer';
 import { Scene } from './scene';
@@ -95,6 +97,13 @@ window.onload = async () => {
       randomCoord() - 10
     ), Math.floor(Math.random() * 2), Math.floor(Math.random() * 6));
   }
+
+  const objData = await loadObj('./obj/example1.obj');
+  const mesh4 = new InstancedCustomMesh(objData);
+  mesh4.setTextureImages([
+    await fetchImageData('./obj/example1.jpg'),
+  ]);
+  scene.addMesh(mesh4);
 
   // renderer
   const renderer = new Renderer(ctx, device);

@@ -25,3 +25,7 @@ export function fetchImageData(src: string): Promise<ImageData> {
     img.src = src;
   });
 }
+
+export function fetchText(src: string): Promise<string> {
+  return fetch(src).then(res => res.text());
+}
