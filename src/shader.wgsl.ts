@@ -46,6 +46,14 @@ var<private> model = array<mat4x4f, 6>(
       0.0, 0.0, 0.0, 1.0)
 );
 
+// TODO: 後で uniform で渡せるようにする
+var<private> scale = mat4x4f(
+  1.0, 0.0, 0.0, 0.0,
+  0.0, 1.0, 0.0, 0.0,
+  0.0, 0.0, 1.0, 0.0,
+  0.0, 0.0, 0.0, 1.0
+);
+
 @vertex
 fn vertex_main(
   @location(0) offset: vec3f,
@@ -56,7 +64,7 @@ fn vertex_main(
   @location(5) textureId: u32
 ) -> VertexOut {
   var out: VertexOut;
-  out.position = projection * view * (vec4f(position, 1.0) + model[rotation] * vec4f(offset, 1.0));
+  out.position = projection * view * (vec4f(position, 1.0) + scale * model[rotation] * vec4f(offset, 1.0));
 
   // ライティング
   // TODO: 環境光によるライティング

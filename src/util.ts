@@ -29,3 +29,21 @@ export function fetchImageData(src: string): Promise<ImageData> {
 export function fetchText(src: string): Promise<string> {
   return fetch(src).then(res => res.text());
 }
+
+export function preprocessText(text: string): string[] {
+  const lines: string[] = [];
+  text.replace(/\r/g, '').split('\n').forEach(line => {
+    // 余計なスペースを除去
+    line = line.replace(/\s+/g, ' ').replace(/(^\s|\s$)/g, '');
+    // 空の行を削除
+    if (line == '') {
+      return;
+    }
+    // コメント行を削除
+    if (line.startsWith('#')) {
+      return;
+    }
+    lines.push(line);
+  });
+  return lines;
+}

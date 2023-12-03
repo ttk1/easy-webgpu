@@ -247,6 +247,8 @@ export class Renderer {
         });
         textureBuffer.unmap();
 
+        // TODO: テクスチャの幅が 64 ピクセル（256 バイト）じゃないと読み込めない問題なんとかしたい
+        // bytesPerRow (64) is not a multiple of 256.
         commandEncoder.copyBufferToTexture(
           {
             buffer: textureBuffer,

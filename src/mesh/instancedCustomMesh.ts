@@ -1,5 +1,4 @@
 import { Face } from '../face';
-import { Obj } from '../loader';
 import { Vec2, Vec3 } from '../vector';
 import { InstancedMesh } from './instancedMesh';
 
@@ -14,11 +13,11 @@ export class InstancedCustomMesh implements InstancedMesh {
   private textureImages: ImageData[];
   private vertexCount: number;
 
-  public constructor(data: Obj) {
-    this.v = data.v;
-    this.vn = data.vn;
-    this.vt = data.vt;
-    this.f = data.f;
+  public constructor(v: number[][], vn: number[][], vt: number[][], f: number[][][]) {
+    this.v = v;
+    this.vn = vn;
+    this.vt = vt;
+    this.f = f;
     this.vertices = [];
     this.normals = [];
     this.uvCoords = [];

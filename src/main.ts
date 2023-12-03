@@ -98,12 +98,24 @@ window.onload = async () => {
     ), Math.floor(Math.random() * 2), Math.floor(Math.random() * 6));
   }
 
-  const objData = await loadObj('./obj/example1.obj');
-  const mesh4 = new InstancedCustomMesh(objData);
-  mesh4.setTextureImages([
-    await fetchImageData('./obj/example1.jpg'),
-  ]);
-  scene.addMesh(mesh4);
+  // Mineways の出力を読み込み
+  const obj = await loadObj('./obj/example.obj');
+  console.log(obj.objects.length);
+  for (let i = 0; i < obj.objects.length; i++) {
+    const mesh4 = new InstancedCustomMesh(
+      obj.v,
+      obj.vn,
+      obj.vt,
+      obj.objects[i].f
+    );
+    const mtl = obj.materials.find(material => material.name == obj.objects[i].mtlName);
+    if (mtl != null && mtl.mapKd != null) {
+      mesh4.setTextureImages([
+        await fetchImageData(mtl.mapKd)
+      ]);
+    }
+    scene.addMesh(mesh4);
+  }
 
   // renderer
   const renderer = new Renderer(ctx, device);
