@@ -100,7 +100,6 @@ window.onload = async () => {
 
   // Mineways の出力を読み込み
   const obj = await loadObj('./obj/example.obj');
-  console.log(obj.objects.length);
   for (let i = 0; i < obj.objects.length; i++) {
     const mesh4 = new InstancedCustomMesh(
       obj.v,
