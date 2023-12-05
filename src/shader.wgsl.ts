@@ -81,6 +81,11 @@ fn vertex_main(
 
 @fragment
 fn fragment_main(fragData: VertexOut) -> @location(0) vec4f {
-  return vec4f(fragData.diffuse * textureSample(myTexture, mySampler, fragData.uv, fragData.textureId).rgb, 1.0);
+  let texColor = textureSample(myTexture, mySampler, fragData.uv, fragData.textureId);
+  // 不透明度が一定以下の場合に描画をスキップし透過させる
+  if (texColor.a <= 0.5) {
+    discard;
+  }
+  return vec4f(fragData.diffuse * texColor.rgb, 1.0);
 }
 `;
